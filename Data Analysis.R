@@ -52,7 +52,6 @@ for (i in hobbies_list) {
   cat("Mean", i , "=", mean(hobbies_price[hobbies_price$item_id == i,]$sell_price),"\n")
 }
 
-
 # Set the seed for reproducibility
 set.seed(3163)
 # Specify the number of rows to sample
