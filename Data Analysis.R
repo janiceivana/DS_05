@@ -1,10 +1,10 @@
 getwd()
 setwd("D:/YEAR 3/Semester 1/FIT3163")
 
-calender = read.csv("calendar.csv")
-validation = read.csv("sales_train_validation.csv")
-evaluation = read.csv("sales_train_evaluation.csv")
-price = read.csv("sell_prices.csv")
+calender = read.csv("calendar.csv", stringsAsFactors = T)
+validation = read.csv("sales_train_validation.csv", stringsAsFactors = T)
+evaluation = read.csv("sales_train_evaluation.csv", stringsAsFactors = T)
+price = read.csv("sell_prices.csv", stringsAsFactors = T)
 
 unique(evaluation$cat_id)
 #HOBBIES, HOUSEHOLD,FOODS
@@ -14,6 +14,11 @@ library(dplyr)
 hobbies = evaluation %>% filter(cat_id == "HOBBIES")
 household = evaluation %>% filter(cat_id == "HOUSEHOLD")
 foods = evaluation %>% filter(cat_id == "FOODS")
+
+#CREATE NEW COLUMN FOR THE SUM OF UNIT SOLD 
+hobbies$sum_unit_sold <- rowSums(hobbies[, 7:1947])
+household$sum_unit_sold <- rowSums(household[, 7:1947])
+foods$sum_unit_sold <- rowSums(foods[, 7:1947])
 
 #SUBSETTING CATEGORY PRICE
 hobbies_price = price[grep("HOBBIES", apply(price, 1, paste, collapse = ",")), ]
@@ -30,11 +35,69 @@ t.test(hobbies_price$sell_price, conf.level = 0.95)
 t.test(household_price$sell_price, conf.level = 0.95)
 t.test(foods_price$sell_price, conf.level = 0.95)
 
-#MERGE
-hobbies_merge = merge(hobbies,hobbies_price)
+#HYPOTHESIS TESTING
+t.test(hobbies$sum_unit_sold,household$sum_unit_sold)
+t.test(hobbies$sum_unit_sold,foods$sum_unit_sold)
+t.test(household$sum_unit_sold,foods$sum_unit_sold)
+
+#CONFIDENCE INTERVAL
+t.test(hobbies$sum_unit_sold, conf.level = 0.95)
+t.test(household$sum_unit_sold, conf.level = 0.95)
+t.test(foods$sum_unit_sold, conf.level = 0.95)
+
 
 #APPENDIX
 hobbies_list = unique(hobbies_price$item_id)
 for (i in hobbies_list) {
   cat("Mean", i , "=", mean(hobbies_price[hobbies_price$item_id == i,]$sell_price),"\n")
 }
+
+
+# Set the seed for reproducibility
+set.seed(3163)
+# Specify the number of rows to sample
+n = 1000
+
+#HOBBIES SAMPLING
+sampled_hobbies = hobbies[sample(nrow(hobbies), n), ]
+sampled_hobbies_price = hobbies_price[sample(nrow(hobbies_price), n), ]
+
+#HOUSEHOLD SAMPLING
+sampled_household = household[sample(nrow(household), n), ]
+sampled_household_price = household_price[sample(nrow(household_price), n), ]
+
+#FOODS SAMPLING
+sampled_foods = foods[sample(nrow(foods), n), ]
+sampled_foods_price = foods_price[sample(nrow(foods_price), n), ]
+
+#MERGE
+hobbies_merge = merge(sampled_hobbies,sampled_hobbies_price, by="item_id")
+household_merge = merge(sampled_household,sampled_household_price, by="item_id")
+foods_merge = merge(sampled_foods,sampled_foods_price,by="item_id")
+
+#LINEAR REGRESSION - HOBBIES
+hobbies_merge_fit_data = hobbies_merge[,7:1951]
+fit.hobbies = lm(sell_price ~ ., data = hobbies_merge_fit_data)
+summary(fit.hobbies)
+sort(summary(fit.hobbies)$coefficients[, "Pr(>|t|)"])
+
+fit.hobbies = lm(sell_price ~ sum_unit_sold, data = hobbies_merge_fit_data)
+summary(fit.hobbies)
+
+#LINEAR REGRESSION - HOUSEHOLD
+household_merge_fit_data = household_merge[,7:1951]
+fit.household = lm(sell_price ~ ., data = household_merge_fit_data)
+summary(fit.household)
+sort(summary(fit.household)$coefficients[, "Pr(>|t|)"])
+
+fit.household = lm(sell_price ~ sum_unit_sold, data = household_merge_fit_data)
+summary(fit.household)
+
+#LINEAR REGRESSION - FOODS
+foods_merge_fit_data = foods_merge[,7:1951]
+fit.foods = lm(sell_price ~ ., data = foods_merge_fit_data)
+summary(fit.foods)
+sort(summary(fit.foods)$coefficients[, "Pr(>|t|)"])
+
+fit.foods = lm(sell_price ~ sum_unit_sold, data = foods_merge_fit_data)
+summary(fit.foods)
