@@ -25,6 +25,40 @@ hobbies_price = price[grep("HOBBIES", apply(price, 1, paste, collapse = ",")), ]
 household_price = price[grep("HOUSEHOLD", apply(price, 1, paste, collapse = ",")), ]
 foods_price = price[grep("FOODS", apply(price, 1, paste, collapse = ",")), ]
 
+dim(hobbies)
+dim(household)
+dim(foods)
+
+dim(hobbies_price)
+dim(household_price)
+dim(foods_price)
+
+#CLEANING
+hobbies_clean = hobbies %>% distinct()
+hobbies_clean = na.omit(hobbies_clean)
+household_clean = household %>% distinct()
+household_clean = na.omit(household_clean)
+foods_clean = foods %>% distinct()
+foods_clean = na.omit(foods_clean)
+
+hobbies_price_clean = hobbies_price %>% distinct()
+hobbies_price_clean = na.omit(hobbies_price_clean)
+household_price_clean = household_price %>% distinct()
+household_price_clean = na.omit(household_price_clean)
+foods_price_clean = foods_price %>% distinct()
+foods_price_clean = na.omit(foods_price_clean)
+
+#AFTER CLEANING
+dim(hobbies_clean)
+dim(household_clean)
+dim(foods_clean)
+
+dim(hobbies_price_clean)
+dim(household_price_clean)
+dim(foods_price_clean)
+
+#THE RESULT IS THE SAME -> MEANING THE DATA IS CLEANED
+
 #HYPOTHESIS TESTING
 t.test(hobbies_price$sell_price,household_price$sell_price)
 t.test(hobbies_price$sell_price,foods_price$sell_price)
