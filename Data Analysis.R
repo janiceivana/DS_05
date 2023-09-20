@@ -108,6 +108,10 @@ hobbies_merge = merge(sampled_hobbies,sampled_hobbies_price, by="item_id")
 household_merge = merge(sampled_household,sampled_household_price, by="item_id")
 foods_merge = merge(sampled_foods,sampled_foods_price,by="item_id")
 
+x = seq(min(hobbies_merge$sell_price),max(hobbies_merge$sell_price), 0,1)
+y = hobbies_merge$sum_unit_sold
+plot(hobbies_merge$sell_price,hobbies_merge$sum_unit_sold)
+
 #LINEAR REGRESSION - HOBBIES
 hobbies_merge_fit_data = hobbies_merge[,7:1951]
 fit.hobbies = lm(sell_price ~ ., data = hobbies_merge_fit_data)
