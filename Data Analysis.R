@@ -118,7 +118,7 @@ evaluation_df = rbind(evaluation_df, add_grid)
 # Reset the index of grid_df
 evaluation_df = evaluation_df[order(row.names(evaluation_df)), ]  # Order by row names to reset index
 rownames(evaluation_df) = NULL  # Reset row names
-colnames(evaluation_df)[colnames(evaluation_df) == TARGET] < "TARGET"  # Rename TARGET column
+colnames(evaluation_df)[colnames(evaluation_df) == TARGET] = "TARGET"  # Rename TARGET column
 
 # Remove temporary dataframes
 rm(temp_df, add_grid)
