@@ -103,10 +103,17 @@ sampled_household_price = household_price[sample(nrow(household_price), n), ]
 sampled_foods = foods[sample(nrow(foods), n), ]
 sampled_foods_price = foods_price[sample(nrow(foods_price), n), ]
 
+#CALENDER SAMPLING
+sampled_calender = calender[sample(nrow(calender), n), ]
+
 #MERGE
 hobbies_merge = merge(sampled_hobbies,sampled_hobbies_price, by="item_id")
 household_merge = merge(sampled_household,sampled_household_price, by="item_id")
 foods_merge = merge(sampled_foods,sampled_foods_price,by="item_id")
+
+hobbies_merge = merge(hobbies_merge,calender, by="wm_yr_wk")
+household_merge = merge(household_merge,calender, by="wm_yr_wk")
+foods_merge = merge(foods_merge,calender, by="wm_yr_wk")
 
 x = seq(min(hobbies_merge$sell_price),max(hobbies_merge$sell_price), 0,1)
 y = hobbies_merge$sum_unit_sold
@@ -140,3 +147,4 @@ sort(summary(fit.foods)$coefficients[, "Pr(>|t|)"])
 
 fit.foods = lm(sell_price ~ sum_unit_sold, data = foods_merge_fit_data)
 summary(fit.foods)
+
