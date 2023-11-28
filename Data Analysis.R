@@ -81,6 +81,61 @@ t.test(foods$sum_unit_sold, conf.level = 0.95)
 
 
 #APPENDIX
+TARGET = 'sales'         # Our main target
+END_TRAIN = 1941         # Last day in train set
+MAIN_INDEX = c('id','d')  # We can identify item by these columns
+
+# Loading required library
+library(tidyr)
+
+# Define index columns in R
+index_columns = c('id', 'item_id', 'dept_id', 'cat_id', 'store_id', 'state_id')
+
+# Perform the equivalent melt operation in R using gather() from tidyr
+evaluation_df = evaluation %>% gather(key = 'd', value = TARGET, -one_of(index_columns))
+
+print(evaluation_df)
+
+# Print the lengths of evaluation and evaluation_df
+cat("Train rows:", length(evaluation), length(evaluation_df), "\n")
+
+# To be able to make predictions, we need to add "test set" to our grid
+
+# Create an empty dataframe to store the additional grid
+add_grid = data.frame()
+
+for (i in 1:28) {
+  temp_df = evaluation[index_columns, drop = FALSE]  # Subset train_df with index_columns
+  temp_df = unique(temp_df)  # Remove duplicates
+  temp_df$d = paste0('d_', END_TRAIN + i)  # Add 'd_' and the incremented value to 'd' column
+  temp_df[[TARGET]] <- NA  # Set TARGET column to NA
+  add_grid = rbind(add_grid, temp_df)  # Concatenate temp_df to add_grid
+}
+
+# Concatenate grid_df and add_grid
+evaluation_df = rbind(evaluation_df, add_grid)
+
+# Reset the index of grid_df
+evaluation_df = evaluation_df[order(row.names(evaluation_df)), ]  # Order by row names to reset index
+rownames(evaluation_df) = NULL  # Reset row names
+colnames(evaluation_df)[colnames(evaluation_df) == TARGET] < "TARGET"  # Rename TARGET column
+
+# Remove temporary dataframes
+rm(temp_df, add_grid)
+
+# Remove the original train_df
+rm(evaluation)
+
+# Convert index columns to factors to save memory
+for (col in index_columns) {
+  evaluation_df[[col]] <- as.factor(evaluation_df[[col]])
+}
+
+# Print memory usage before and after reducing memory usage
+print(sprintf("%20s: %8s", 'Original grid_df', format(object.size(grid_df), units = "auto")))
+print(sprintf("%20s: %8s", 'Reduced grid_df', format(object.size(grid_df), units = "auto")))
+
+
 hobbies_list = unique(hobbies_price$item_id)
 for (i in hobbies_list) {
   cat("Mean", i , "=", mean(hobbies_price[hobbies_price$item_id == i,]$sell_price),"\n")
