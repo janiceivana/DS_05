@@ -9,6 +9,34 @@ price = read.csv("sell_prices.csv", stringsAsFactors = T)
 unique(evaluation$cat_id)
 #HOBBIES, HOUSEHOLD,FOODS
 
+library(dplyr)
+
+dim(price)
+max_price = max(price$sell_price)
+min_price = min(price$sell_price)
+summary(price)
+
+max_index = which.max(price$sell_price)
+min_index = which.min(price$sell_price)
+
+max_store = price$store_id[max_index]
+min_store = price$store_id[min_index]
+
+max_item = price$item_id[max_index]
+min_item = price$item_id[min_index]
+
+price$wm_yr_wk[max_index]
+price$wm_yr_wk[min_index]
+
+# Accessing the result without levels
+max_store_character = as.character(max_store)
+# Accessing the result without levels
+min_store_character = as.character(min_store)
+
+cat("The highest price in the data is: USD", max_price, "at", max_store_character)
+cat("The lowest price in the data is: USD", min_price, "at", min_store_character)
+
+
 #SUBSETTING EVALUATION DATA BASED ON CATEGORY
 library(dplyr)
 hobbies = evaluation %>% filter(cat_id == "HOBBIES")
