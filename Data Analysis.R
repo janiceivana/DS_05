@@ -110,61 +110,6 @@ t.test(household$sum_unit_sold, conf.level = 0.95)
 t.test(foods$sum_unit_sold, conf.level = 0.95)
 
 
-#APPENDIX
-TARGET = 'sales'         # Our main target
-END_TRAIN = 1941         # Last day in train set
-MAIN_INDEX = c('id','d')  # We can identify item by these columns
-
-# Loading required library
-library(tidyr)
-
-# Define index columns in R
-index_columns = c('id', 'item_id', 'dept_id', 'cat_id', 'store_id', 'state_id')
-
-# Perform the equivalent melt operation in R using gather() from tidyr
-evaluation_df = evaluation %>% gather(key = 'd', value = TARGET, -one_of(index_columns))
-
-print(evaluation_df)
-
-# Print the lengths of evaluation and evaluation_df
-cat("Train rows:", length(evaluation), length(evaluation_df), "\n")
-
-# To be able to make predictions, we need to add "test set" to our grid
-
-# Create an empty dataframe to store the additional grid
-add_grid = data.frame()
-
-for (i in 1:28) {
-  temp_df = evaluation[index_columns, drop = FALSE]  # Subset train_df with index_columns
-  temp_df = unique(temp_df)  # Remove duplicates
-  temp_df$d = paste0('d_', END_TRAIN + i)  # Add 'd_' and the incremented value to 'd' column
-  temp_df[[TARGET]] <- NA  # Set TARGET column to NA
-  add_grid = rbind(add_grid, temp_df)  # Concatenate temp_df to add_grid
-}
-
-# Concatenate grid_df and add_grid
-evaluation_df = rbind(evaluation_df, add_grid)
-
-# Reset the index of grid_df
-evaluation_df = evaluation_df[order(row.names(evaluation_df)), ]  # Order by row names to reset index
-rownames(evaluation_df) = NULL  # Reset row names
-colnames(evaluation_df)[colnames(evaluation_df) == TARGET] = "TARGET"  # Rename TARGET column
-
-# Remove temporary dataframes
-rm(temp_df, add_grid)
-
-# Remove the original train_df
-rm(evaluation)
-
-# Convert index columns to factors to save memory
-for (col in index_columns) {
-  evaluation_df[[col]] <- as.factor(evaluation_df[[col]])
-}
-
-# Print memory usage before and after reducing memory usage
-print(sprintf("%20s: %8s", 'Original grid_df', format(object.size(grid_df), units = "auto")))
-print(sprintf("%20s: %8s", 'Reduced grid_df', format(object.size(grid_df), units = "auto")))
-
 
 hobbies_list = unique(hobbies_price$item_id)
 for (i in hobbies_list) {
@@ -237,3 +182,134 @@ summary(fit.foods)
 ################################################################################
 
 #DATA VIZ AND ANALYSIS
+
+hobbies_total_sales = hobbies_merge$sum_unit_sold * hobbies_merge$sell_price
+hobbies_merge$sales = hobbies_total_sales
+
+household_total_sales = household_merge$sum_unit_sold * household_merge$sell_price
+household_merge$sales = household_total_sales
+
+foods_total_sales = foods_merge$sum_unit_sold * foods_merge$sell_price
+foods_merge$sales = foods_total_sales
+
+
+hobbies_viz = cbind(as.character(hobbies_merge$state_id),as.character(hobbies_merge$dept_id),as.character(hobbies_merge$cat_id), hobbies_merge$sell_price, hobbies_merge$sales)
+
+household_viz = cbind(as.character(household_merge$state_id),as.character(household_merge$dept_id),as.character(household_merge$cat_id), household_merge$sell_price, household_merge$sales)
+
+foods_viz = cbind(as.character(foods_merge$state_id),as.character(foods_merge$dept_id),as.character(foods_merge$cat_id), foods_merge$sell_price, foods_merge$sales)
+
+
+my_data = rbind(hobbies_viz,household_viz,foods_viz)
+colnames(my_data) =  c("state_id","dept_id","cat_id","sell_price", "sales")
+
+my_data = as.data.frame(my_data)
+my_data = unique(my_data) 
+View(my_data)
+
+#PLOTTING PRICES AND SALES FOR EACH CATEGORY
+
+# Convert cat_id to factor
+my_data$cat_id = factor(my_data$cat_id)
+
+# Example using pch for different categories
+plot(my_data$sell_price, my_data$sales, pch = 1:length(levels(my_data$cat_id)),
+     main = "Relationship between Prices and Sales Volumes",
+     xlab = "Price", ylab = "Sales", col = 1:length(levels(my_data$cat_id)))
+
+# Add legend
+legend("topright", legend = levels(my_data$cat_id),
+       col = 1:length(levels(my_data$cat_id)), pch = 1:length(levels(my_data$cat_id)))
+
+
+#PLOTTING PRICES AND SALES FOR EACH DEPARMENT
+
+# Convert cat_id to factor
+my_data$dept_id = factor(my_data$dept_id)
+
+# Example using pch for different categories
+plot(my_data$sell_price, my_data$sales, pch = 1:length(levels(my_data$dept_id)),
+     main = "Relationship between Prices and Sales Volumes",
+     xlab = "Price", ylab = "Sales", col = 1:length(levels(my_data$dept_id)))
+
+# Add legend
+legend("topright", legend = levels(my_data$dept_id),
+       col = 1:length(levels(my_data$dept_id)), pch = 1:length(levels(my_data$dept_id)))
+
+
+#PLOTTING PRICES AND SALES FOR EACH STATE
+
+# Convert cat_id to factor
+my_data$state_id = factor(my_data$state_id)
+
+# Example using pch for different categories
+plot(my_data$sell_price, my_data$sales, pch = 1:length(levels(my_data$state_id)),
+     main = "Relationship between Prices and Sales Volumes",
+     xlab = "Price", ylab = "Sales", col = 1:length(levels(my_data$state_id)))
+
+# Add legend
+legend("topright", legend = levels(my_data$state_id),
+       col = 1:length(levels(my_data$state_id)), pch = 1:length(levels(my_data$state_id)))
+
+
+
+
+
+################################################################################
+
+#APPENDIX
+TARGET = 'sales'         # Our main target
+END_TRAIN = 1941         # Last day in train set
+MAIN_INDEX = c('id','d')  # We can identify item by these columns
+
+# Loading required library
+library(tidyr)
+
+# Define index columns in R
+index_columns = c('id', 'item_id', 'dept_id', 'cat_id', 'store_id', 'state_id')
+
+# Perform the equivalent melt operation in R using gather() from tidyr
+evaluation_df = evaluation %>% gather(key = 'd', value = TARGET, -one_of(index_columns))
+
+
+print(evaluation_df)
+
+# Print the lengths of evaluation and evaluation_df
+cat("Train rows:", length(evaluation), length(evaluation_df), "\n")
+
+# To be able to make predictions, we need to add "test set" to our grid
+
+# Create an empty dataframe to store the additional grid
+add_grid = data.frame()
+
+for (i in 1:28) {
+  temp_df = evaluation[index_columns, drop = FALSE]  # Subset train_df with index_columns
+  temp_df = unique(temp_df)  # Remove duplicates
+  temp_df$d = paste0('d_', END_TRAIN + i)  # Add 'd_' and the incremented value to 'd' column
+  temp_df[[TARGET]] <- NA  # Set TARGET column to NA
+  add_grid = rbind(add_grid, temp_df)  # Concatenate temp_df to add_grid
+}
+
+# Concatenate grid_df and add_grid
+evaluation_df = rbind(evaluation_df, add_grid)
+
+# Reset the index of grid_df
+evaluation_df = evaluation_df[order(row.names(evaluation_df)), ]  # Order by row names to reset index
+rownames(evaluation_df) = NULL  # Reset row names
+colnames(evaluation_df)[colnames(evaluation_df) == TARGET] = "TARGET"  # Rename TARGET column
+
+# Remove temporary dataframes
+rm(temp_df, add_grid)
+
+# Remove the original train_df
+rm(evaluation)
+
+# Convert index columns to factors to save memory
+for (col in index_columns) {
+  evaluation_df[[col]] <- as.factor(evaluation_df[[col]])
+}
+
+# Print memory usage before and after reducing memory usage
+print(sprintf("%20s: %8s", 'Original grid_df', format(object.size(grid_df), units = "auto")))
+print(sprintf("%20s: %8s", 'Reduced grid_df', format(object.size(grid_df), units = "auto")))
+
