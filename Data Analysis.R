@@ -16,6 +16,8 @@ max_price = max(price$sell_price)
 min_price = min(price$sell_price)
 summary(price)
 
+sort(price$sell_price)
+
 max_index = which.max(price$sell_price)
 min_index = which.min(price$sell_price)
 
@@ -231,3 +233,7 @@ sort(summary(fit.foods)$coefficients[, "Pr(>|t|)"])
 fit.foods = lm(sell_price ~ sum_unit_sold, data = foods_merge_fit_data)
 summary(fit.foods)
 
+
+################################################################################
+
+#DATA VIZ AND ANALYSIS
