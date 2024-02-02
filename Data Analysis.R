@@ -151,6 +151,38 @@ plot(hobbies_merge$sell_price,hobbies_merge$sum_unit_sold, main="Hobbies Correla
 plot(household_merge$sell_price,household_merge$sum_unit_sold, main="Household Correlation Between Sell Price and Unit Sold", xlab="Sell Price",ylab = "Sum Unit Sold")
 plot(foods_merge$sell_price,foods_merge$sum_unit_sold, main="Foods Correlation Between Sell Price and Unit Sold", xlab="Sell Price",ylab = "Sum Unit Sold")
 
+
+library(ggplot2)
+#Hobbies for each state
+ggplot(hobbies_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor(state_id))) +
+  geom_point() + ggtitle("Relationship between Sell Price and Sales Volume for each State")
+
+#Household for each state
+ggplot(household_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor(state_id))) +
+  geom_point() + ggtitle("Relationship between Sell Price and Sales Volume for each State")
+
+#Foods for each state
+ggplot(foods_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor(state_id))) +
+  geom_point() + ggtitle("Relationship between Sell Price and Sales Volume for each State")
+
+
+#Hobbies for each state
+ggplot(hobbies_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor(dept_id))) +
+  geom_point() + ggtitle("Relationship between Sell Price and Sales Volume for each Department")
+
+#Household for each state
+ggplot(household_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor(dept_id))) +
+  geom_point() + ggtitle("Relationship between Sell Price and Sales Volume for each Department")
+
+#Foods for each state
+ggplot(foods_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor(dept_id))) +
+  geom_point() + ggtitle("Relationship between Sell Price and Sales Volume for each Department")
+
+plot(hobbies_merge$wm_yr_wk, hobbies_merge$sum_unit_sold)
+
+duplicated_rows <- hobbies_merge[duplicated(hobbies_merge), ]
+print(duplicated_rows)
+
 #LINEAR REGRESSION - HOBBIES
 hobbies_merge_fit_data = hobbies_merge[,7:1951]
 fit.hobbies = lm(sell_price ~ ., data = hobbies_merge_fit_data)
