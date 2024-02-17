@@ -246,7 +246,7 @@ my_data$cat_id = factor(my_data$cat_id)
 
 # Example using pch for different categories
 plot(my_data$sell_price, my_data$sales, pch = 1:length(levels(my_data$cat_id)),
-     main = "Relationship between Prices and Sales Volumes",
+     main = "Relationship between Prices and Sales (Revenue)",
      xlab = "Price", ylab = "Sales", col = 1:length(levels(my_data$cat_id)))
 
 # Add legend
@@ -261,7 +261,7 @@ my_data$dept_id = factor(my_data$dept_id)
 
 # Example using pch for different categories
 plot(my_data$sell_price, my_data$sales, pch = 1:length(levels(my_data$dept_id)),
-     main = "Relationship between Prices and Sales Volumes",
+     main = "Relationship between Prices and Sales (Revenue)",
      xlab = "Price", ylab = "Sales", col = 1:length(levels(my_data$dept_id)))
 
 # Add legend
@@ -276,7 +276,7 @@ my_data$state_id = factor(my_data$state_id)
 
 # Example using pch for different categories
 plot(my_data$sell_price, my_data$sales, pch = 1:length(levels(my_data$state_id)),
-     main = "Relationship between Prices and Sales Volumes",
+     main = "Relationship between Prices and Sales (Revenue)",
      xlab = "Price", ylab = "Sales", col = 1:length(levels(my_data$state_id)))
 
 # Add legend
