@@ -285,7 +285,7 @@ legend("topright", legend = levels(my_data$state_id),
 
 summary(my_data)
 #histogram -> show number of distribution for each category, department, and state (for each sales volume, revenue, and price)
-hist(my_data$sell_price, ylim = c(0,800))
+hist(my_data$sell_price, ylim = c(0,800), xlab = "Price", main = "Price Distribution")
 
 library(tidyverse)
 
@@ -369,7 +369,7 @@ max_occasion_price <- hobbies_merge %>%
 # Bar chart
 ggplot(hobbies_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sell_price)) +
   geom_bar(stat = "identity") +
-  labs(title = "Day with Highest Revenue",
+  labs(title = "Occasion with Highest Price",
        x = "Day",
        y = "Total Sales") +
   geom_vline(xintercept = max_occasion_price, linetype = "dashed", color = "red") 
@@ -405,7 +405,7 @@ max_occasion_price <- household_merge %>%
 # Bar chart
 ggplot(household_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sell_price)) +
   geom_bar(stat = "identity") +
-  labs(title = "Day with Highest Revenue",
+  labs(title = "Occasion with Highest Price",
        x = "Day",
        y = "Total Sales") +
   geom_vline(xintercept = max_occasion_price, linetype = "dashed", color = "red") 
@@ -441,7 +441,7 @@ max_occasion_price <- foods_merge %>%
 # Bar chart
 ggplot(foods_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sell_price)) +
   geom_bar(stat = "identity") +
-  labs(title = "Day with Highest Revenue",
+  labs(title = "Occasions with Highest Price",
        x = "Day",
        y = "Total Sales") +
   geom_vline(xintercept = max_occasion_price, linetype = "dashed", color = "red") 
