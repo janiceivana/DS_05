@@ -178,11 +178,6 @@ ggplot(household_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor
 ggplot(foods_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor(dept_id))) +
   geom_point() + ggtitle("Relationship between Sell Price and Sales Volume for each Department")
 
-plot(hobbies_merge$wm_yr_wk, hobbies_merge$sum_unit_sold)
-
-duplicated_rows <- hobbies_merge[duplicated(hobbies_merge), ]
-print(duplicated_rows)
-
 #LINEAR REGRESSION - HOBBIES
 hobbies_merge_fit_data = hobbies_merge[,7:1951]
 fit.hobbies = lm(sell_price ~ ., data = hobbies_merge_fit_data)
@@ -225,15 +220,15 @@ foods_total_sales = foods_merge$sum_unit_sold * foods_merge$sell_price
 foods_merge$sales = foods_total_sales
 
 
-hobbies_viz = cbind(as.character(hobbies_merge$state_id),as.character(hobbies_merge$dept_id),as.character(hobbies_merge$cat_id), hobbies_merge$sell_price, hobbies_merge$sales)
+hobbies_viz = cbind(as.character(hobbies_merge$state_id),as.character(hobbies_merge$dept_id),as.character(hobbies_merge$cat_id), hobbies_merge$sell_price, hobbies_merge$sales, hobbies_merge$sum_unit_sold)
 
-household_viz = cbind(as.character(household_merge$state_id),as.character(household_merge$dept_id),as.character(household_merge$cat_id), household_merge$sell_price, household_merge$sales)
+household_viz = cbind(as.character(household_merge$state_id),as.character(household_merge$dept_id),as.character(household_merge$cat_id), household_merge$sell_price, household_merge$sales, household_merge$sum_unit_sold)
 
-foods_viz = cbind(as.character(foods_merge$state_id),as.character(foods_merge$dept_id),as.character(foods_merge$cat_id), foods_merge$sell_price, foods_merge$sales)
+foods_viz = cbind(as.character(foods_merge$state_id),as.character(foods_merge$dept_id),as.character(foods_merge$cat_id), foods_merge$sell_price, foods_merge$sales, foods_merge$sum_unit_sold)
 
 
 my_data = rbind(hobbies_viz,household_viz,foods_viz)
-colnames(my_data) =  c("state_id","dept_id","cat_id","sell_price", "sales")
+colnames(my_data) =  c("state_id","dept_id","cat_id","sell_price", "revenue", "sales_volume")
 
 my_data = as.data.frame(my_data)
 my_data = unique(my_data) 
@@ -245,9 +240,9 @@ View(my_data)
 my_data$cat_id = factor(my_data$cat_id)
 
 # Example using pch for different categories
-plot(my_data$sell_price, my_data$sales, pch = 1:length(levels(my_data$cat_id)),
+plot(my_data$sell_price, my_data$revenue, pch = 1:length(levels(my_data$cat_id)),
      main = "Relationship between Prices and Sales (Revenue)",
-     xlab = "Price", ylab = "Sales", col = 1:length(levels(my_data$cat_id)))
+     xlab = "Price", ylab = "Revenue", col = 1:length(levels(my_data$cat_id)))
 
 # Add legend
 legend("topright", legend = levels(my_data$cat_id),
@@ -260,9 +255,9 @@ legend("topright", legend = levels(my_data$cat_id),
 my_data$dept_id = factor(my_data$dept_id)
 
 # Example using pch for different categories
-plot(my_data$sell_price, my_data$sales, pch = 1:length(levels(my_data$dept_id)),
+plot(my_data$sell_price, my_data$revenue, pch = 1:length(levels(my_data$dept_id)),
      main = "Relationship between Prices and Sales (Revenue)",
-     xlab = "Price", ylab = "Sales", col = 1:length(levels(my_data$dept_id)))
+     xlab = "Price", ylab = "Revenue", col = 1:length(levels(my_data$dept_id)))
 
 # Add legend
 legend("topright", legend = levels(my_data$dept_id),
@@ -271,18 +266,196 @@ legend("topright", legend = levels(my_data$dept_id),
 
 #PLOTTING PRICES AND SALES FOR EACH STATE
 
-# Convert cat_id to factor
+# Convert column to suitable datatype
 my_data$state_id = factor(my_data$state_id)
+my_data$sell_price = as.numeric(my_data$sell_price)
+my_data$revenue = as.numeric(my_data$revenue)
+my_data$sales_volume = as.numeric(my_data$sales_volume)
+
 
 # Example using pch for different categories
-plot(my_data$sell_price, my_data$sales, pch = 1:length(levels(my_data$state_id)),
+plot(my_data$sell_price, my_data$revenue, pch = 1:length(levels(my_data$state_id)),
      main = "Relationship between Prices and Sales (Revenue)",
-     xlab = "Price", ylab = "Sales", col = 1:length(levels(my_data$state_id)))
+     xlab = "Price", ylab = "Revenue", col = 1:length(levels(my_data$state_id)))
 
 # Add legend
 legend("topright", legend = levels(my_data$state_id),
        col = 1:length(levels(my_data$state_id)), pch = 1:length(levels(my_data$state_id)))
 
+
+summary(my_data)
+#histogram -> show number of distribution for each category, department, and state (for each sales volume, revenue, and price)
+hist(my_data$sell_price, ylim = c(0,800))
+
+library(tidyverse)
+
+# Histogram for sales volume
+ggplot(my_data, aes(x = sales_volume)) +
+  geom_histogram(bins = 20) +
+  labs(title = "Distribution of Sales Volume by Category") +
+  facet_wrap(~ cat_id)
+
+ggplot(my_data, aes(x = sales_volume)) +
+  geom_histogram(bins = 20) +
+  labs(title = "Distribution of Sales Volume by Department") +
+  facet_wrap(~ dept_id)
+
+ggplot(my_data, aes(x = sales_volume)) +
+  geom_histogram(bins = 20) +
+  labs(title = "Distribution of Sales Volume by State") +
+  facet_wrap(~ state_id)
+
+# Histogram for revenue
+ggplot(my_data, aes(x = revenue)) +
+  geom_histogram(bins = 20) +
+  labs(title = "Distribution of Revenue by Category") +
+  facet_wrap(~ cat_id)
+
+ggplot(my_data, aes(x = revenue)) +
+  geom_histogram(bins = 20) +
+  labs(title = "Distribution of Revenue by Deparment") +
+  facet_wrap(~ dept_id)
+
+
+ggplot(my_data, aes(x = revenue)) +
+  geom_histogram(bins = 20) +
+  labs(title = "Distribution of Revenue by State") +
+  facet_wrap(~ state_id)
+
+
+# Histogram for price
+ggplot(my_data, aes(x = sell_price)) +
+  geom_histogram(bins = 20) +
+  labs(title = "Distribution of Price by Category") +
+  facet_wrap(~ cat_id)
+
+ggplot(my_data, aes(x = sell_price)) +
+  geom_histogram(bins = 20) +
+  labs(title = "Distribution of Price by Department") +
+  facet_wrap(~ dept_id)
+
+ggplot(my_data, aes(x = sell_price)) +
+  geom_histogram(bins = 20) +
+  labs(title = "Distribution of Price by State") +
+  facet_wrap(~ state_id)
+
+#find out on which occasion, and which day that have the highest number of sales and sales volume -> bar chart
+
+#HOBBIES
+# Find occasion with highest sales volume
+max_occasion <- hobbies_merge %>%
+  filter(str_trim(event_type_1) != "") %>%
+  group_by(event_type_1) %>%
+  summarise(total_sales = sum(sum_unit_sold, na.rm = TRUE)) %>%
+  top_n(1, total_sales) %>%
+  pull(event_type_1)
+
+# Bar chart
+ggplot(hobbies_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sum_unit_sold)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Occasions with Highest Sales Volume",
+       x = "Occasion",
+       y = "Total Sales Volume") +
+  geom_vline(xintercept = max_occasion, linetype = "dashed", color = "red")
+
+# Find occasion with highest price
+max_occasion_price <- hobbies_merge %>%
+  filter(str_trim(event_type_1) != "") %>%
+  group_by(event_type_1) %>%
+  summarise(total_sales = sum(sell_price, na.rm = TRUE)) %>%
+  top_n(1, total_sales) %>%
+  pull(event_type_1)
+
+# Bar chart
+ggplot(hobbies_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sell_price)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Day with Highest Revenue",
+       x = "Day",
+       y = "Total Sales") +
+  geom_vline(xintercept = max_occasion_price, linetype = "dashed", color = "red") 
+
+# Find occasion with highest revenue
+
+
+#HOUSEHOLD
+# Find occasion with highest sales volume
+max_occasion <- household_merge %>%
+  filter(str_trim(event_type_1) != "") %>%
+  group_by(event_type_1) %>%
+  summarise(total_sales = sum(sum_unit_sold, na.rm = TRUE)) %>%
+  top_n(1, total_sales) %>%
+  pull(event_type_1)
+
+# Bar chart
+ggplot(household_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sum_unit_sold)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Occasions with Highest Sales Volume",
+       x = "Occasion",
+       y = "Total Sales Volume") +
+  geom_vline(xintercept = max_occasion, linetype = "dashed", color = "red")
+
+# Find occasion with highest price
+max_occasion_price <- household_merge %>%
+  filter(str_trim(event_type_1) != "") %>%
+  group_by(event_type_1) %>%
+  summarise(total_sales = sum(sell_price, na.rm = TRUE)) %>%
+  top_n(1, total_sales) %>%
+  pull(event_type_1)
+
+# Bar chart
+ggplot(household_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sell_price)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Day with Highest Revenue",
+       x = "Day",
+       y = "Total Sales") +
+  geom_vline(xintercept = max_occasion_price, linetype = "dashed", color = "red") 
+
+# Find occasion with highest revenue
+
+
+#FOODS
+# Find occasion with highest sales volume
+max_occasion <- foods_merge %>%
+  filter(str_trim(event_type_1) != "") %>%
+  group_by(event_type_1) %>%
+  summarise(total_sales = sum(sum_unit_sold, na.rm = TRUE)) %>%
+  top_n(1, total_sales) %>%
+  pull(event_type_1)
+
+# Bar chart
+ggplot(foods_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sum_unit_sold)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Occasions with Highest Sales Volume",
+       x = "Occasion",
+       y = "Total Sales Volume") +
+  geom_vline(xintercept = max_occasion, linetype = "dashed", color = "red")
+
+# Find occasion with highest price
+max_occasion_price <- foods_merge %>%
+  filter(str_trim(event_type_1) != "") %>%
+  group_by(event_type_1) %>%
+  summarise(total_sales = sum(sell_price, na.rm = TRUE)) %>%
+  top_n(1, total_sales) %>%
+  pull(event_type_1)
+
+# Bar chart
+ggplot(foods_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sell_price)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Day with Highest Revenue",
+       x = "Day",
+       y = "Total Sales") +
+  geom_vline(xintercept = max_occasion_price, linetype = "dashed", color = "red") 
+
+# Find occasion with highest revenue
+
+
+
+#By event name
+#By which day 
+
+
+
+#for each category see the price fluctuation throughout each occasion or day by day (price) -> line chart
 
 
 
