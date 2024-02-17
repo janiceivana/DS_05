@@ -370,12 +370,28 @@ max_occasion_price <- hobbies_merge %>%
 ggplot(hobbies_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sell_price)) +
   geom_bar(stat = "identity") +
   labs(title = "Occasion with Highest Price",
-       x = "Day",
-       y = "Total Sales") +
+       x = "Occasion",
+       y = "Price") +
   geom_vline(xintercept = max_occasion_price, linetype = "dashed", color = "red") 
 
 # Find occasion with highest revenue
+max_occasion_revenue <- hobbies_merge %>%
+  filter(str_trim(event_type_1) != "") %>%
+  group_by(event_type_1) %>%
+  summarise(total_sales = sum(sales, na.rm = TRUE)) %>%
+  top_n(1, total_sales) %>%
+  pull(event_type_1)
 
+# Bar chart
+ggplot(hobbies_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sales)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Occasion with Highest Revenue",
+       x = "Occasion",
+       y = "Total Revenue") +
+  geom_vline(xintercept = max_occasion_revenue, linetype = "dashed", color = "red") 
+
+
+#####################################################################
 
 #HOUSEHOLD
 # Find occasion with highest sales volume
@@ -389,7 +405,7 @@ max_occasion <- household_merge %>%
 # Bar chart
 ggplot(household_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sum_unit_sold)) +
   geom_bar(stat = "identity") +
-  labs(title = "Occasions with Highest Sales Volume",
+  labs(title = "Occasions with Highest Sales Volume (Hobbies)",
        x = "Occasion",
        y = "Total Sales Volume") +
   geom_vline(xintercept = max_occasion, linetype = "dashed", color = "red")
@@ -405,13 +421,31 @@ max_occasion_price <- household_merge %>%
 # Bar chart
 ggplot(household_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sell_price)) +
   geom_bar(stat = "identity") +
-  labs(title = "Occasion with Highest Price",
-       x = "Day",
-       y = "Total Sales") +
+  labs(title = "Occasion with Highest Price (Hobbies)",
+       x = "Occasion",
+       y = "Price") +
   geom_vline(xintercept = max_occasion_price, linetype = "dashed", color = "red") 
 
 # Find occasion with highest revenue
+max_occasion_revenue <- household_merge %>%
+  filter(str_trim(event_type_1) != "") %>%
+  group_by(event_type_1) %>%
+  summarise(total_sales = sum(sales, na.rm = TRUE)) %>%
+  top_n(1, total_sales) %>%
+  pull(event_type_1)
 
+# Bar chart
+ggplot(household_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sales)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Occasion with Highest Revenue (Hobbies)",
+       x = "Occasion",
+       y = "Total Revenue") +
+  geom_vline(xintercept = max_occasion_revenue, linetype = "dashed", color = "red") 
+
+
+
+
+#####################################################################
 
 #FOODS
 # Find occasion with highest sales volume
@@ -425,7 +459,7 @@ max_occasion <- foods_merge %>%
 # Bar chart
 ggplot(foods_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sum_unit_sold)) +
   geom_bar(stat = "identity") +
-  labs(title = "Occasions with Highest Sales Volume",
+  labs(title = "Occasions with Highest Sales Volume (Hobbies)",
        x = "Occasion",
        y = "Total Sales Volume") +
   geom_vline(xintercept = max_occasion, linetype = "dashed", color = "red")
@@ -441,30 +475,206 @@ max_occasion_price <- foods_merge %>%
 # Bar chart
 ggplot(foods_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sell_price)) +
   geom_bar(stat = "identity") +
-  labs(title = "Occasions with Highest Price",
-       x = "Day",
-       y = "Total Sales") +
+  labs(title = "Occasions with Highest Price (Hobbies)",
+       x = "Occasion",
+       y = "Price") +
   geom_vline(xintercept = max_occasion_price, linetype = "dashed", color = "red") 
 
 # Find occasion with highest revenue
+max_occasion_revenue <- foods_merge %>%
+  filter(str_trim(event_type_1) != "") %>%
+  group_by(event_type_1) %>%
+  summarise(total_sales = sum(sales, na.rm = TRUE)) %>%
+  top_n(1, total_sales) %>%
+  pull(event_type_1)
+
+# Bar chart
+ggplot(foods_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sales)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Occasion with Highest Revenue (Hobbies)",
+       x = "Occasion",
+       y = "Total Revenue") +
+  ylim()
+  geom_vline(xintercept = max_occasion_revenue, linetype = "dashed", color = "red") 
 
 
+#By event name 
+#By which day - debug tgt
 
-#By event name
-#By which day 
+#for each category see the price fluctuation throughout each occasion or year (price) -> line chart
+  
+#HOBBIES
+# Calculate average sell price for hobbies and year
+average_prices <- hobbies_merge %>%
+  group_by(year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE))
+
+# Plot average sell price per year for hobbies
+ggplot(average_prices, aes(x = year, y = avg_sell_price)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation (Hobbies)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Calculate average sell price for hobbies and year by state
+average_prices <- hobbies_merge %>%
+  group_by(state_id, year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE), .groups = "drop")
+
+# Plot average sell price per year for hobbies
+ggplot(average_prices, aes(x = year, y = avg_sell_price, color = state_id)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation by State (Hobbies)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Calculate average sell price for hobbies and year by department
+average_prices <- hobbies_merge %>%
+  group_by(dept_id, year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE), .groups = "drop")
+
+# Plot average sell price per year for hobbies
+ggplot(average_prices, aes(x = year, y = avg_sell_price, color = dept_id)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation by Deparment (Hobbies)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
+# Calculate average sell price for hobbies and year by event type
+average_prices <- hobbies_merge %>%
+  group_by(event_type_1, year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE), .groups = "drop")
 
-#for each category see the price fluctuation throughout each occasion or day by day (price) -> line chart
+# Plot average sell price per year for hobbies
+ggplot(average_prices, aes(x = year, y = avg_sell_price, color = event_type_1)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation by Event Type (Hobbies)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+######################################################################  
+#HOUSEHOLD
+
+# Calculate average sell price for household and year
+average_prices <- household_merge %>%
+  group_by(year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE))
+
+# Plot average sell price per year for household
+ggplot(average_prices, aes(x = year, y = avg_sell_price)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation (Household)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Calculate average sell price for household and year by state
+average_prices <- household_merge %>%
+  group_by(state_id, year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE), .groups = "drop")
+
+# Plot average sell price per year for household
+ggplot(average_prices, aes(x = year, y = avg_sell_price, color = state_id)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation by State (Household)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Calculate average sell price for household and year by department
+average_prices <- household_merge %>%
+  group_by(dept_id, year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE), .groups = "drop")
+
+# Plot average sell price per year for household
+ggplot(average_prices, aes(x = year, y = avg_sell_price, color = dept_id)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation by Deparment (Household)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Calculate average sell price for household and year by event type
+average_prices <- household_merge %>%
+  group_by(event_type_1, year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE), .groups = "drop")
+
+# Plot average sell price per year for household
+ggplot(average_prices, aes(x = year, y = avg_sell_price, color = event_type_1)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation by Event Type (Household)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#####################################################################
+#FOODS
+
+# Calculate average sell price for foods and year
+average_prices <- foods_merge %>%
+  group_by(year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE))
+
+# Plot average sell price per year for foods
+ggplot(average_prices, aes(x = year, y = avg_sell_price)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation (Foods)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Calculate average sell price for foods and year by state
+average_prices <- foods_merge %>%
+  group_by(state_id, year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE), .groups = "drop")
+
+# Plot average sell price per year for foods
+ggplot(average_prices, aes(x = year, y = avg_sell_price, color = state_id)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation by State (Foods)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Calculate average sell price for foods and year by department
+average_prices <- foods_merge %>%
+  group_by(dept_id, year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE), .groups = "drop")
+
+# Plot average sell price per year for foods
+ggplot(average_prices, aes(x = year, y = avg_sell_price, color = dept_id)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation by Deparment (Foods)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
+# Calculate average sell price for foods and year by event type
+average_prices <- foods_merge %>%
+  group_by(event_type_1, year) %>%
+  summarise(avg_sell_price = mean(sell_price, na.rm = TRUE), .groups = "drop")
 
+# Plot average sell price per year for foods
+ggplot(average_prices, aes(x = year, y = avg_sell_price, color = event_type_1)) +
+  geom_line() +
+  labs(title = "Average Price Fluctuation by Event Type (Foods)",
+       x = "Year",
+       y = "Average Sell Price") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 ################################################################################
 
 #APPENDIX
 TARGET = 'sales'         # Our main target
-END_TRAIN = 1941         # Last day in train set
+
+monday_sales = hobbies_merge[hobbies_merge$weekday == "Monday", "sales"]
+sum(monday_sales)END_TRAIN = 1941         # Last day in train set
 MAIN_INDEX = c('id','d')  # We can identify item by these columns
 
 # Loading required library
