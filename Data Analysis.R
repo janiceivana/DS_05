@@ -145,7 +145,7 @@ hobbies_merge = merge(hobbies_merge,calender, by="wm_yr_wk")
 household_merge = merge(household_merge,calender, by="wm_yr_wk")
 foods_merge = merge(foods_merge,calender, by="wm_yr_wk")
 
-x = seq(min(hobbies_merge$sell_price),max(hobbies_merge$sell_price), 0,1)
+x = seq(min(hobbies_merge$sell_price),max(hobbies_merge$sell_price),1)
 y = hobbies_merge$sum_unit_sold
 plot(hobbies_merge$sell_price,hobbies_merge$sum_unit_sold, main="Hobbies Correlation Between Sell Price and Unit Sold", xlab="Sell Price",ylab = "Sum Unit Sold")
 plot(household_merge$sell_price,household_merge$sum_unit_sold, main="Household Correlation Between Sell Price and Unit Sold", xlab="Sell Price",ylab = "Sum Unit Sold")
@@ -177,34 +177,6 @@ ggplot(household_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor
 #Foods for each state
 ggplot(foods_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor(dept_id))) +
   geom_point() + ggtitle("Relationship between Sell Price and Sales Volume for each Department")
-
-#LINEAR REGRESSION - HOBBIES
-hobbies_merge_fit_data = hobbies_merge[,7:1951]
-fit.hobbies = lm(sell_price ~ ., data = hobbies_merge_fit_data)
-summary(fit.hobbies)
-sort(summary(fit.hobbies)$coefficients[, "Pr(>|t|)"])
-
-fit.hobbies = lm(sell_price ~ sum_unit_sold, data = hobbies_merge_fit_data)
-summary(fit.hobbies)
-
-#LINEAR REGRESSION - HOUSEHOLD
-household_merge_fit_data = household_merge[,7:1951]
-fit.household = lm(sell_price ~ ., data = household_merge_fit_data)
-summary(fit.household)
-sort(summary(fit.household)$coefficients[, "Pr(>|t|)"])
-
-fit.household = lm(sell_price ~ sum_unit_sold, data = household_merge_fit_data)
-summary(fit.household)
-
-#LINEAR REGRESSION - FOODS
-foods_merge_fit_data = foods_merge[,7:1951]
-fit.foods = lm(sell_price ~ ., data = foods_merge_fit_data)
-summary(fit.foods)
-sort(summary(fit.foods)$coefficients[, "Pr(>|t|)"])
-
-fit.foods = lm(sell_price ~ sum_unit_sold, data = foods_merge_fit_data)
-summary(fit.foods)
-
 
 ################################################################################
 
@@ -727,4 +699,32 @@ for (col in index_columns) {
 # Print memory usage before and after reducing memory usage
 print(sprintf("%20s: %8s", 'Original grid_df', format(object.size(grid_df), units = "auto")))
 print(sprintf("%20s: %8s", 'Reduced grid_df', format(object.size(grid_df), units = "auto")))
+
+#LINEAR REGRESSION - HOBBIES
+hobbies_merge_fit_data = hobbies_merge[,7:1951]
+fit.hobbies = lm(sell_price ~ ., data = hobbies_merge_fit_data)
+summary(fit.hobbies)
+sort(summary(fit.hobbies)$coefficients[, "Pr(>|t|)"])
+
+fit.hobbies = lm(sell_price ~ sum_unit_sold, data = hobbies_merge_fit_data)
+summary(fit.hobbies)
+
+#LINEAR REGRESSION - HOUSEHOLD
+household_merge_fit_data = household_merge[,7:1951]
+fit.household = lm(sell_price ~ ., data = household_merge_fit_data)
+summary(fit.household)
+sort(summary(fit.household)$coefficients[, "Pr(>|t|)"])
+
+fit.household = lm(sell_price ~ sum_unit_sold, data = household_merge_fit_data)
+summary(fit.household)
+
+#LINEAR REGRESSION - FOODS
+foods_merge_fit_data = foods_merge[,7:1951]
+fit.foods = lm(sell_price ~ ., data = foods_merge_fit_data)
+summary(fit.foods)
+sort(summary(fit.foods)$coefficients[, "Pr(>|t|)"])
+
+fit.foods = lm(sell_price ~ sum_unit_sold, data = foods_merge_fit_data)
+summary(fit.foods)
+
 
