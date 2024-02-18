@@ -466,7 +466,6 @@ ggplot(foods_merge %>% filter(event_type_1 != ""), aes(x = event_type_1, y = sal
   labs(title = "Occasion with Highest Revenue (Hobbies)",
        x = "Occasion",
        y = "Total Revenue") +
-  ylim()
   geom_vline(xintercept = max_occasion_revenue, linetype = "dashed", color = "red") 
 
 
@@ -639,6 +638,88 @@ ggplot(average_prices, aes(x = year, y = avg_sell_price, color = event_type_1)) 
        x = "Year",
        y = "Average Sell Price") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#– How does price affect sales volumes and revenue?
+library(ggplot2)
+
+# Calculate average price
+average_price <- my_data %>%
+  group_by(dept_id) %>%
+  summarise(avg_price = mean(sell_price, na.rm = TRUE))
+
+# Merge average price with the original data frame
+my_data <- merge(my_data, average_price, by = "dept_id")
+
+# Scatter plot for average price vs. sales volume
+ggplot(my_data, aes(x = avg_price, y = sales_volume, color = dept_id)) +
+  geom_point() +
+  labs(title = "Average Price vs. Sales Volume",
+       x = "Average Price",
+       y = "Sales Volume")
+
+# Scatter plot for average price vs. revenue
+ggplot(my_data, aes(x = avg_price, y = revenue, color = dept_id)) +
+  geom_point() +
+  labs(title = "Average Price vs. Revenue",
+       x = "Average Price",
+       y = "Revenue")
+
+
+library(dplyr)
+library(ggplot2)
+
+# Calculate total sales volume and total revenue for each product_id
+summary_data <- my_data %>%
+  group_by(dept_id) %>%
+  summarise(total_sales_volume = sum(sales_volume, na.rm = TRUE),
+            total_revenue = sum(revenue, na.rm = TRUE),
+            avg_price = mean(sell_price, na.rm = TRUE)) %>%
+  ungroup()
+
+# Scatter plot for average price vs total sales volume
+ggplot(summary_data, aes(x = avg_price, y = total_sales_volume, color = dept_id)) +
+  geom_point() +
+  labs(title = "Average Price vs Total Sales Volume",
+       x = "Average Price",
+       y = "Total Sales Volume") +
+  geom_text(aes(label = dept_id), vjust = -0.5, hjust = 0.5, size =2.5) 
+
+# Scatter plot for average price vs total revenue
+ggplot(summary_data, aes(x = avg_price, y = total_revenue, color = dept_id)) +
+  geom_point() +
+  labs(title = "Average Price vs Total Revenue",
+       x = "Average Price",
+       y = "Total Revenue")  +
+  geom_text(aes(label = dept_id), vjust = -0.5, hjust = 0.5, size =2.5) 
+
+
+
+# Calculate average sales volume and average revenue for each product_id
+summary_data <- my_data %>%
+  group_by(dept_id) %>%
+  summarise(avg_sales_volume = mean(sales_volume, na.rm = TRUE),
+            avg_revenue = mean(revenue, na.rm = TRUE),
+            avg_price = mean(sell_price, na.rm = TRUE)) %>%
+  ungroup()
+
+# Scatter plot for average price vs total sales volume
+ggplot(summary_data, aes(x = avg_price, y = avg_sales_volume, color = dept_id)) +
+  geom_point() +
+  labs(title = "Average Price vs Total Sales Volume",
+       x = "Average Price",
+       y = "Average Sales Volume") +
+  geom_text(aes(label = dept_id), vjust = -0.5, hjust = 0.5, size =2.5) 
+
+# Scatter plot for average price vs total revenue
+ggplot(summary_data, aes(x = avg_price, y = avg_revenue, color = dept_id)) +
+  geom_point() +
+  labs(title = "Average Price vs Total Revenue",
+       x = "Average Price",
+       y = "Average Revenue")  +
+  geom_text(aes(label = dept_id), vjust = -0.5, hjust = 0.5, size =2.5) 
+
+
+
 
 ################################################################################
 
