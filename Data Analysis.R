@@ -124,27 +124,32 @@ n = 1000
 
 #HOBBIES SAMPLING
 sampled_hobbies = hobbies[sample(nrow(hobbies), n), ]
-sampled_hobbies_price = hobbies_price[sample(nrow(hobbies_price), n), ]
 
 #HOUSEHOLD SAMPLING
 sampled_household = household[sample(nrow(household), n), ]
-sampled_household_price = household_price[sample(nrow(household_price), n), ]
 
 #FOODS SAMPLING
 sampled_foods = foods[sample(nrow(foods), n), ]
-sampled_foods_price = foods_price[sample(nrow(foods_price), n), ]
-
-#CALENDER SAMPLING
-sampled_calender = calender[sample(nrow(calender), n), ]
 
 #MERGE
 hobbies_merge = merge(hobbies_price,calender, by="wm_yr_wk")
 household_merge = merge(household_price,calender, by="wm_yr_wk")
 foods_merge = merge(foods_price,calender, by="wm_yr_wk")
 
-hobbies_merge = merge(sampled_hobbies,hobbies_merge, by="item_id")
-household_merge = merge(sampled_household,hobbies_merge, by="item_id")
-foods_merge = merge(sampled_foods,hobbies_merge,by="item_id")
+
+#HOBBIES MERGE SAMPLING
+hobbies_merge_sampling = hobbies_merge[sample(nrow(hobbies_merge), n), ]
+
+#HOUSEHOLD MERGE SAMPLING
+household_merge_sampling = household_merge[sample(nrow(household_merge), n), ]
+
+#FOODS MERGE SAMPLING
+foods_merge_sampling = foods_merge[sample(nrow(foods_merge), n), ]
+
+
+hobbies_merge = merge(sampled_hobbies,hobbies_merge_sampling, by="item_id")
+household_merge = merge(sampled_household,household_merge_sampling, by="item_id")
+foods_merge = merge(sampled_foods,foods_merge_sampling,by="item_id")
 
 x = seq(min(hobbies_merge$sell_price),max(hobbies_merge$sell_price),1)
 y = hobbies_merge$sum_unit_sold
