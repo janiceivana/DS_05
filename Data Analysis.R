@@ -157,7 +157,7 @@ plot(hobbies_merge$sell_price,hobbies_merge$sum_unit_sold, main="Hobbies Correla
 plot(household_merge$sell_price,household_merge$sum_unit_sold, main="Household Correlation Between Sell Price and Unit Sold", xlab="Sell Price",ylab = "Sum Unit Sold")
 plot(foods_merge$sell_price,foods_merge$sum_unit_sold, main="Foods Correlation Between Sell Price and Unit Sold", xlab="Sell Price",ylab = "Sum Unit Sold")
 
-
+hobbies_merge$sum_unit_sold.y[1]
 library(ggplot2)
 #Hobbies for each state
 ggplot(hobbies_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor(state_id))) +
