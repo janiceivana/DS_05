@@ -8,6 +8,7 @@ price = read.csv("sell_prices.csv", stringsAsFactors = T)
 
 unique(evaluation$cat_id)
 #HOBBIES, HOUSEHOLD,FOODS
+calender$date = as.Date(calender$date)
 
 library(dplyr)
 
@@ -137,13 +138,13 @@ sampled_foods_price = foods_price[sample(nrow(foods_price), n), ]
 sampled_calender = calender[sample(nrow(calender), n), ]
 
 #MERGE
-hobbies_merge = merge(sampled_hobbies,sampled_hobbies_price, by="item_id")
-household_merge = merge(sampled_household,sampled_household_price, by="item_id")
-foods_merge = merge(sampled_foods,sampled_foods_price,by="item_id")
+hobbies_merge = merge(hobbies_price,calender, by="wm_yr_wk")
+household_merge = merge(household_price,calender, by="wm_yr_wk")
+foods_merge = merge(foods_price,calender, by="wm_yr_wk")
 
-hobbies_merge = merge(hobbies_merge,calender, by="wm_yr_wk")
-household_merge = merge(household_merge,calender, by="wm_yr_wk")
-foods_merge = merge(foods_merge,calender, by="wm_yr_wk")
+hobbies_merge = merge(sampled_hobbies,hobbies_merge, by="item_id")
+household_merge = merge(sampled_household,hobbies_merge, by="item_id")
+foods_merge = merge(sampled_foods,hobbies_merge,by="item_id")
 
 x = seq(min(hobbies_merge$sell_price),max(hobbies_merge$sell_price),1)
 y = hobbies_merge$sum_unit_sold
@@ -191,8 +192,7 @@ household_merge$sales = household_total_sales
 foods_total_sales = foods_merge$sum_unit_sold * foods_merge$sell_price
 foods_merge$sales = foods_total_sales
 
-
-hobbies_viz = cbind(as.character(hobbies_merge$state_id),as.character(hobbies_merge$dept_id),as.character(hobbies_merge$cat_id), hobbies_merge$sell_price, hobbies_merge$sales, hobbies_merge$sum_unit_sold)
+hobbies_viz = cbind(as.character(hobbies_merge$state_id),as.character(hobbies_merge$dept_id),as.character(hobbies_merge$cat_id), hobbies_merge$sell_price, hobbies_merge$sales, hobbies_merge$sum_unit_sold, hobbies_merge$date)
 
 household_viz = cbind(as.character(household_merge$state_id),as.character(household_merge$dept_id),as.character(household_merge$cat_id), household_merge$sell_price, household_merge$sales, household_merge$sum_unit_sold)
 
@@ -718,6 +718,27 @@ ggplot(summary_data, aes(x = avg_price, y = avg_revenue, color = dept_id)) +
        y = "Average Revenue")  +
   geom_text(aes(label = dept_id), vjust = -0.5, hjust = 0.5, size =2.5) 
 
+################################################################################
+
+#Price Elasticity Modelling
+
+# Calculate the percentage change in price and quantity demanded
+df <- my_data %>%
+  group_by(cat_id) %>%
+  arrange(cat_id, date) %>%
+  mutate(price_change = sell_price / lag(sell_price) - 1,
+         quantity_change = sales_volume / lag(sales_volume) - 1)
+
+# Calculate the price elasticity of demand
+df <- df %>%
+  mutate(price_elasticity = quantity_change / price_change)
+
+# Plot price elasticity of demand for each product
+ggplot(df, aes(x = product_id, y = price_elasticity)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Price Elasticity of Demand for Different Products",
+       x = "Product ID",
+       y = "Price Elasticity")
 
 
 
