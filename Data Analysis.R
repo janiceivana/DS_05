@@ -120,7 +120,7 @@ for (i in hobbies_list) {
 # Set the seed for reproducibility
 set.seed(3163)
 # Specify the number of rows to sample
-n = 1000
+n = 5000
 
 #HOBBIES SAMPLING
 sampled_hobbies = hobbies[sample(nrow(hobbies), n), ]
@@ -136,15 +136,15 @@ hobbies_merge = merge(hobbies_price,calender, by="wm_yr_wk")
 household_merge = merge(household_price,calender, by="wm_yr_wk")
 foods_merge = merge(foods_price,calender, by="wm_yr_wk")
 
-
+m = 5000
 #HOBBIES MERGE SAMPLING
-hobbies_merge_sampling = hobbies_merge[sample(nrow(hobbies_merge), n), ]
+hobbies_merge_sampling = hobbies_merge[sample(nrow(hobbies_merge), m), ]
 
 #HOUSEHOLD MERGE SAMPLING
-household_merge_sampling = household_merge[sample(nrow(household_merge), n), ]
+household_merge_sampling = household_merge[sample(nrow(household_merge), m), ]
 
 #FOODS MERGE SAMPLING
-foods_merge_sampling = foods_merge[sample(nrow(foods_merge), n), ]
+foods_merge_sampling = foods_merge[sample(nrow(foods_merge), m), ]
 
 
 hobbies_merge = merge(sampled_hobbies,hobbies_merge_sampling, by="item_id")
