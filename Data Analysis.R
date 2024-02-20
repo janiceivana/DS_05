@@ -764,6 +764,104 @@ ggplot(price_elasticity, aes(x = dept_id, y = price_elasticity)) +
        x = "Product ID",
        y = "Price Elasticity")
 
+
+################################################################################
+#Regression Analysis
+
+# Load the necessary library
+library(dplyr)
+
+# Filter out rows with missing values in relevant columns
+my_data <- my_data[!is.na(my_data$sell_price) & !is.na(my_data$quantity_change), ]
+
+# Fit a linear regression model
+model <- lm(quantity_change ~ sell_price, data = my_data)
+summary(model)
+
+# Get the coefficients
+coefficients <- coef(model)
+
+# Extract the coefficient for sell_price
+price_coefficient <- coefficients["sell_price"]
+
+# Calculate price elasticity of demand
+price_elasticity <- price_coefficient * (mean(my_data$sell_price) / mean(my_data$quantity_change))
+
+# Print the estimated price elasticity
+print(paste("Price Elasticity of Demand:", price_elasticity))
+
+################################################################################
+
+# Perform linear regression
+model <- lm(sales_volume ~ sell_price, data = my_data)
+summary(model)
+
+# Get the regression coefficients
+intercept <- coef(model)[1]
+slope <- coef(model)[2]
+
+# Calculate price elasticity
+price_elasticity <- -slope * (mean(my_data$sell_price) / mean(my_data$sales_volume))
+
+# Print the results
+print(paste("Price Elasticity of Demand:", price_elasticity))
+
+################################################################################
+# Calculate quantity sold
+my_data$quantity_sold <- my_data$revenue / my_data$sell_price
+
+# Function to calculate price elasticity for a department
+calculate_price_elasticity <- function(data) {
+  if (nrow(data) < 2) {
+    return(NA)
+  }
+  
+  # Fit a linear regression model
+  model <- lm(quantity_sold ~ sell_price, data = data)
+  
+  # Get the coefficients
+  coefficients <- coef(model)
+  
+  # Calculate price elasticity
+  price_coefficient <- coefficients["sell_price"]
+  price_elasticity <- price_coefficient * (mean(data$sell_price) / mean(data$quantity_sold))
+  return(list(price_elasticity = price_elasticity, model = model))
+  
+}
+
+# Calculate price elasticity for each department
+price_elasticity <- sapply(split(my_data, my_data$dept_id), calculate_price_elasticity)
+
+# Convert the result to a data frame
+price_elasticity_df <- data.frame(dept_id = names(price_elasticity), price_elasticity = unlist(price_elasticity))
+
+# Print the results
+print(price_elasticity_df)
+
+
+################################################################################
+
+# Calculate revenue elasticity
+my_data$revenue_elasticity <- my_data$price_change * my_data$avg_price
+
+# Plot the relationship between price change and revenue
+plot(my_data$price_change, my_data$revenue_elasticity, 
+     xlab = "Price Change", ylab = "Revenue Elasticity",
+     main = "Price Elasticity of Revenue")
+
+
+################################################################################
+
+# Calculate sales volume elasticity
+my_data$sales_volume_elasticity <- my_data$price_change * my_data$avg_price
+
+# Plot the relationship between price change and sales volume
+plot(my_data$price_change, my_data$sales_volume_elasticity, 
+     xlab = "Price Change", ylab = "Sales Volume Elasticity",
+     main = "Price Elasticity of Sales Volume")
+
+
+
 ################################################################################
 
 
