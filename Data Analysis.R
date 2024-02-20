@@ -157,7 +157,6 @@ plot(hobbies_merge$sell_price,hobbies_merge$sum_unit_sold, main="Hobbies Correla
 plot(household_merge$sell_price,household_merge$sum_unit_sold, main="Household Correlation Between Sell Price and Unit Sold", xlab="Sell Price",ylab = "Sum Unit Sold")
 plot(foods_merge$sell_price,foods_merge$sum_unit_sold, main="Foods Correlation Between Sell Price and Unit Sold", xlab="Sell Price",ylab = "Sum Unit Sold")
 
-hobbies_merge$sum_unit_sold.y[1]
 library(ggplot2)
 #Hobbies for each state
 ggplot(hobbies_merge, aes(x = sell_price, y = sum_unit_sold, color = as.factor(state_id))) +
@@ -197,24 +196,21 @@ household_merge$sales = household_total_sales
 foods_total_sales = foods_merge$sum_unit_sold * foods_merge$sell_price
 foods_merge$sales = foods_total_sales
 
-hobbies_viz = cbind(as.character(hobbies_merge$state_id),as.character(hobbies_merge$dept_id),as.character(hobbies_merge$cat_id), hobbies_merge$sell_price, hobbies_merge$sales, hobbies_merge$sum_unit_sold, hobbies_merge$date)
+library(dplyr)
 
-household_viz = cbind(as.character(household_merge$state_id),as.character(household_merge$dept_id),as.character(household_merge$cat_id), household_merge$sell_price, household_merge$sales, household_merge$sum_unit_sold)
+hobbies_viz = hobbies_merge %>%
+  select(state_id,dept_id,cat_id,sell_price,sales, sum_unit_sold,date)
 
-foods_viz = cbind(as.character(foods_merge$state_id),as.character(foods_merge$dept_id),as.character(foods_merge$cat_id), foods_merge$sell_price, foods_merge$sales, foods_merge$sum_unit_sold)
+household_viz = household_merge %>%
+  select(state_id,dept_id,cat_id,sell_price,sales, sum_unit_sold,date)
 
+foods_viz = foods_merge %>%
+  select(state_id,dept_id,cat_id,sell_price,sales, sum_unit_sold,date)
 
 my_data = rbind(hobbies_viz,household_viz,foods_viz)
-colnames(my_data) =  c("state_id","dept_id","cat_id","sell_price", "revenue", "sales_volume")
-
-my_data = as.data.frame(my_data)
-my_data = unique(my_data) 
-View(my_data)
+colnames(my_data) =  c("state_id","dept_id","cat_id","sell_price", "revenue", "sales_volume", "date")
 
 #PLOTTING PRICES AND SALES FOR EACH CATEGORY
-
-# Convert cat_id to factor
-my_data$cat_id = factor(my_data$cat_id)
 
 # Example using pch for different categories
 plot(my_data$sell_price, my_data$revenue, pch = 1:length(levels(my_data$cat_id)),
@@ -243,13 +239,6 @@ legend("topright", legend = levels(my_data$dept_id),
 
 #PLOTTING PRICES AND SALES FOR EACH STATE
 
-# Convert column to suitable datatype
-my_data$state_id = factor(my_data$state_id)
-my_data$sell_price = as.numeric(my_data$sell_price)
-my_data$revenue = as.numeric(my_data$revenue)
-my_data$sales_volume = as.numeric(my_data$sales_volume)
-
-
 # Example using pch for different categories
 plot(my_data$sell_price, my_data$revenue, pch = 1:length(levels(my_data$state_id)),
      main = "Relationship between Prices and Sales (Revenue)",
@@ -262,7 +251,7 @@ legend("topright", legend = levels(my_data$state_id),
 
 summary(my_data)
 #histogram -> show number of distribution for each category, department, and state (for each sales volume, revenue, and price)
-hist(my_data$sell_price, ylim = c(0,800), xlab = "Price", main = "Price Distribution")
+hist(my_data$sell_price, xlab = "Price", main = "Price Distribution")
 
 library(tidyverse)
 
@@ -710,7 +699,7 @@ summary_data <- my_data %>%
 # Scatter plot for average price vs total sales volume
 ggplot(summary_data, aes(x = avg_price, y = avg_sales_volume, color = dept_id)) +
   geom_point() +
-  labs(title = "Average Price vs Total Sales Volume",
+  labs(title = "Average Price vs Average Sales Volume",
        x = "Average Price",
        y = "Average Sales Volume") +
   geom_text(aes(label = dept_id), vjust = -0.5, hjust = 0.5, size =2.5) 
@@ -718,7 +707,7 @@ ggplot(summary_data, aes(x = avg_price, y = avg_sales_volume, color = dept_id)) 
 # Scatter plot for average price vs total revenue
 ggplot(summary_data, aes(x = avg_price, y = avg_revenue, color = dept_id)) +
   geom_point() +
-  labs(title = "Average Price vs Total Revenue",
+  labs(title = "Average Price vs Average Revenue",
        x = "Average Price",
        y = "Average Revenue")  +
   geom_text(aes(label = dept_id), vjust = -0.5, hjust = 0.5, size =2.5) 
@@ -727,27 +716,56 @@ ggplot(summary_data, aes(x = avg_price, y = avg_revenue, color = dept_id)) +
 
 #Price Elasticity Modelling
 
-# Calculate the percentage change in price and quantity demanded
-df <- my_data %>%
+#For each category 
+
+library(dplyr)
+
+# Calculate quantity_change and price_change
+my_data <- my_data %>%
   group_by(cat_id) %>%
-  arrange(cat_id, date) %>%
-  mutate(price_change = sell_price / lag(sell_price) - 1,
-         quantity_change = sales_volume / lag(sales_volume) - 1)
+  arrange(date) %>%
+  mutate(quantity_change = sales_volume / lag(sales_volume) - 1,
+         price_change = sell_price / lag(sell_price) - 1)
 
-# Calculate the price elasticity of demand
-df <- df %>%
-  mutate(price_elasticity = quantity_change / price_change)
+# Calculate price elasticity of demand for each product
+price_elasticity <- my_data %>%
+  group_by(cat_id) %>%
+  summarise(price_elasticity = sum(quantity_change, na.rm = TRUE) / sum(price_change, na.rm = TRUE))
 
-# Plot price elasticity of demand for each product
-ggplot(df, aes(x = product_id, y = price_elasticity)) +
+# Plot the price elasticity of demand for each product
+ggplot(price_elasticity, aes(x = cat_id, y = price_elasticity)) +
   geom_bar(stat = "identity") +
-  labs(title = "Price Elasticity of Demand for Different Products",
+  labs(title = "Price Elasticity of Demand for Different Category",
        x = "Product ID",
        y = "Price Elasticity")
 
+################################################################################
 
+#For each deparment 
+
+library(dplyr)
+
+# Calculate quantity_change and price_change
+my_data <- my_data %>%
+  group_by(dept_id) %>%
+  arrange(date) %>%
+  mutate(quantity_change = sales_volume / lag(sales_volume) - 1,
+         price_change = sell_price / lag(sell_price) - 1)
+
+# Calculate price elasticity of demand for each product
+price_elasticity <- my_data %>%
+  group_by(dept_id) %>%
+  summarise(price_elasticity = sum(quantity_change, na.rm = TRUE) / sum(price_change, na.rm = TRUE))
+
+# Plot the price elasticity of demand for each product
+ggplot(price_elasticity, aes(x = dept_id, y = price_elasticity)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Price Elasticity of Demand for Different Deparments",
+       x = "Product ID",
+       y = "Price Elasticity")
 
 ################################################################################
+
 
 #APPENDIX
 TARGET = 'sales'         # Our main target
