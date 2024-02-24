@@ -832,10 +832,11 @@ calculate_price_elasticity <- function(data) {
 # Calculate price elasticity for each department
 price_elasticity <- sapply(split(my_data, my_data$dept_id), calculate_price_elasticity)
 
-# Convert the result to a data frame
-price_elasticity_df <- data.frame(dept_id = names(price_elasticity), price_elasticity = unlist(price_elasticity))
+# Convert the matrix to a data frame
+price_elasticity_df <- data.frame(dept_id = colnames(price_elasticity), 
+                                  price_elasticity = as.numeric(price_elasticity[1, ]))
 
-# Print the results
+# Print the data frame
 print(price_elasticity_df)
 
 
