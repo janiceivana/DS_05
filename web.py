@@ -3,20 +3,10 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-import plotly.express as px
+# import plotly.express as px
 
 import pandas as pd  
 import matplotlib.pylab as plt   
-import numpy as np  
-from scipy.stats import linregress  
-import scipy.stats as stats  
-from sklearn.tree import DecisionTreeClassifier  
-from sklearn.metrics import confusion_matrix  
-from matplotlib.colors import ListedColormap  
-from sklearn.ensemble import RandomForestClassifier  
-from sklearn.cluster import KMeans  
-from sklearn.preprocessing import StandardScaler  
-from sklearn.model_selection import train_test_split  
 
 #######################
 # Page configuration
@@ -36,6 +26,33 @@ validation = pd.read_csv("sales_train_validation.csv")
 prices = pd.read_csv("sell_prices.csv")
 sample = pd.read_csv("sample_submission.csv")
 
+# hobbies_1 = pd.read_csv('hobbies_1.csv')
+# hobbies_2 = pd.read_csv('hobbies_2.csv')
+# household_1 = pd.read_csv('household_1.csv')
+# household_2 = pd.read_csv('household_2.csv')
+# food_1 = pd.read_csv('food_1.csv')
+# food_2 = pd.read_csv('food_2.csv')
+# food_3 = pd.read_csv('food_3.csv')
+
+h1_df = pd.read_csv('h1_df.csv')
+h2_df= pd.read_csv('h2_df.csv')
+ho1_df = pd.read_csv('ho1_df.csv')
+ho2_df = pd.read_csv('ho2_df.csv')
+f1_df = pd.read_csv('f1_df.csv')
+f2_df = pd.read_csv('f2_df.csv')
+f3_df = pd.read_csv('f3_df.csv')
+
+department_data = {
+    'FOODS_3': f3_df,
+    'FOODS_2': f2_df,
+    'FOODS_1' : f1_df,
+    'HOUSEHOLD_2' : ho2_df,
+    'HOUSEHOLD_1': ho1_df, 
+    'HOBBIES_2': h2_df,
+    'HOBBIES_1': h1_df
+
+}
+
 # st.write('Hello World')
 # name = st.text_input('Whats your name?')
 # st.write(sample)
@@ -50,83 +67,59 @@ with st.sidebar:
     st.title('🤖 P5: Pricing Optimization and Analysis Dashboard')
     
     year_list = list(calendar.year.unique())[::-1]
+    dept_list = list(evaluation.dept_id.unique())[::-1]
     
     selected_year = st.selectbox('Select a year', year_list)
     df_selected_year = calendar[calendar.year == selected_year]
+
+    selected_department = st.selectbox('Select a deparment', dept_list)
+    selected_data = department_data[selected_department]
+
     # df_selected_year_sorted = df_selected_year.sort_values(by="population", ascending=False)
 
     color_theme_list = ['blues', 'cividis', 'greens', 'inferno', 'magma', 'plasma', 'reds', 'rainbow', 'turbo', 'viridis']
     selected_color_theme = st.selectbox('Select a color theme', color_theme_list)
 
-
 #######################
 
+def vis_elasticity(data):
+    import streamlit as st
+    import pandas as pd
+    import matplotlib.pyplot as plt
 
-# hobbies_1=my_data[my_data['dept_id']=="HOBBIES_1"]
-# hobbies_1 = hobbies_1.drop(hobbies_1[hobbies_1['unit_sale'] == 0].index)
+    Vis = pd.DataFrame()
 
-# h1_df = pd.DataFrame(columns=['item_id', 'dept_id','cat_id','price', 'sale_perday','price_change','sale_change','elasticity'])
+    for item_id in data['item_id'].unique():
+        entry_df = data[data['item_id'] == item_id]
+        
+        price_change = entry_df["price_change"].mean()
+        sale_change = entry_df["sale_change"].mean()
+        elasticity = entry_df["elasticity"].mean()
+        
+        Vis = Vis.append({'item_id': item_id,
+                        'price_change': price_change,
+                        'sale_change': sale_change,
+                        'elasticity': elasticity},ignore_index=True)
 
+    # Create a scatter plot
+    fig, ax = plt.subplots()
+    ax.scatter(Vis['price_change'], Vis['sale_change'])
+    ax.set_title('Scatter Plot of Price Change% vs Sale Change%')
+    ax.set_xlabel('Price Change%')
+    ax.set_ylabel('Sale Change%')
+    ax.grid(True)
 
-# for item_id in hobbies_1['item_id'].unique():
-#     entry_df = hobbies_1[hobbies_1['item_id'] == item_id]
-#     for sell_price in entry_df['sell_price'].unique():
-#         for dept_id in entry_df['dept_id'].unique():
-#             for cat_id in entry_df['cat_id'].unique():
-                
-
-#                 item_df = entry_df[entry_df['sell_price'] == sell_price]
-#                 sale_perday = item_df['unit_sale'].mean()
-
-
-#                 hobbies_1_df = pd.DataFrame({'item_id': [item_id], 'dept_id':[dept_id],'cat_id':[cat_id],'price': [sell_price], 'sale_perday': [sale_perday]})
-#                 hobbies_1_df = hobbies_1_df.dropna()
-
-#                 h1_df = h1_df.append(hobbies_1_df, ignore_index=True)
-
-#                 h1_df['price_change'] = h1_df['price'].pct_change()*100
-#                 h1_df['sale_change'] = h1_df['sale_perday'].pct_change()*100
-#                 h1_df['elasticity'] = -h1_df['sale_change']/h1_df['price_change'] 
-# h1_df=h1_df.dropna()
-# h1_df
-
-# level_values = []
-
-
-# for elasticity in h1_df['elasticity'].values:
-#     if abs(elasticity) > 1:
-#         level_values.append('Elastic Demand')
-#     elif abs(elasticity) == 1:
-#         level_values.append('Unitary Elastic Demand')
-#     elif abs(elasticity) == 0:
-#         level_values.append('Perfectly Inelastic Demand')
-#     else:# abs(elasticity) < 1
-#         level_values.append('Inelastic Demand')
+    # Display the plot using Streamlit
+    st.pyplot(fig)
 
 
-# h1_df['level'] = level_values
-# h1_df
+#######################
+# Dashboard Main Panel
+col = st.columns((4, 4), gap='medium')
 
-# Vis_h1 = pd.DataFrame()
-
-# for item_id in h1_df['item_id'].unique():
-#     entry_df = h1_df[h1_df['item_id'] == item_id]
+with col[0]:
+    st.markdown('#### Price Elasticity Model')
     
-#     price_change = entry_df["price_change"].mean()
-#     sale_change = entry_df["sale_change"].mean()
-#     elasticity = entry_df["elasticity"].mean()
+    vis_elasticity(selected_data)
+
     
-#     Vis_h1 = Vis_h1.append({'item_id': item_id,
-#                     'price_change': price_change,
-#                     'sale_change': sale_change,
-#                     'elasticity': elasticity},ignore_index=True)
-
-# #V1   
-# plt.scatter(Vis_h1['price_change'], Vis_h1['sale_change'])
-
-# plt.title('Hobbies_1 Scatter Plot of Price Change% vs Sale Change%')
-# plt.xlabel('Price Change%')
-# plt.ylabel('Sale Change%')
-# plt.grid(True)
-
-# plt.show()
