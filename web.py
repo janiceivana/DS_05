@@ -36,61 +36,30 @@ validation = pd.read_csv("sales_train_validation.csv")
 prices = pd.read_csv("sell_prices.csv")
 sample = pd.read_csv("sample_submission.csv")
 
-d_cols = [col for col in evaluation.columns if col.startswith('d_')]
-
-fix = evaluation[d_cols].stack().reset_index(level=1)
-fix.columns = ['d','unit_sale']
-
-my_data = evaluation.drop(d_cols, axis=1).join(fix)
-
-my_data['id']=my_data['id'].astype('category')
-my_data['item_id']=my_data['item_id'].astype('category')
-my_data['dept_id']=my_data['dept_id'].astype('category')
-my_data['cat_id']=my_data['cat_id'].astype('category')
-my_data['store_id']=my_data['store_id'].astype('category')
-my_data['state_id']=my_data['state_id'].astype('category')
-my_data['d']=my_data['d'].astype('category')
-my_data['unit_sale']=pd.to_numeric(my_data['unit_sale'],downcast='unsigned')
-
-calendar['date']=calendar['date'].astype('datetime64')
-calendar['weekday']=calendar['weekday'].astype('category')
-calendar['d']=calendar['d'].astype('category')
-calendar['event_name_1']=calendar['event_name_1'].astype('category')
-calendar['event_name_2']=calendar['event_name_2'].astype('category')
-calendar['event_type_1']=calendar['event_type_1'].astype('category')
-calendar['event_type_2']=calendar['event_type_2'].astype('category')
-calendar['snap_CA']=calendar['snap_CA'].astype('bool')
-calendar['snap_TX']=calendar['snap_TX'].astype('bool')
-calendar['snap_WI']=calendar['snap_WI'].astype('bool')
-
-calendar['wm_yr_wk'] = pd.to_numeric(calendar['wm_yr_wk'], downcast='unsigned')
-calendar['wday'] = pd.to_numeric(calendar['wday'], downcast='unsigned')
-calendar['month'] = pd.to_numeric(calendar['month'], downcast='unsigned')
-calendar['year'] = pd.to_numeric(calendar['year'], downcast='unsigned')
-
-prices['store_id'] = prices['store_id'].astype('category')
-prices['item_id'] = prices['item_id'].astype('category')
-
-prices['wm_yr_wk'] = pd.to_numeric(prices['wm_yr_wk'], downcast='unsigned')
-prices['sell_price'] = pd.to_numeric(prices['sell_price'], downcast='float')
-
-my_data = my_data.merge(calendar, on='d', how='left').merge(prices, on=['store_id','item_id','wm_yr_wk'], how='left')
-my_data['d']=my_data['d'].astype('category')
-
-category_prices = my_data.groupby("cat_id")["sell_price"].mean()
-sales_by_category= my_data.groupby("cat_id")["unit_sale"].sum()
-
-category_prices_df = pd.DataFrame({'cat_id': category_prices.index, 'mean_price': category_prices.values})
-sales_by_category_df = pd.DataFrame({'cat_id': sales_by_category.index, 'sum_sale': sales_by_category.values})
-category_df = pd.merge(category_prices_df, sales_by_category_df, on='cat_id')
-category_df['revenue'] = category_df['mean_price']*category_df['sum_sale']
-
 # st.write('Hello World')
 # name = st.text_input('Whats your name?')
 # st.write(sample)
 
 # if st.button("Click Me"):
 #     st.write(f"Hello `{name}`")
+
+
+#######################
+# Sidebar
+with st.sidebar:
+    st.title('🤖 P5: Pricing Optimization and Analysis Dashboard')
+    
+    year_list = list(calendar.year.unique())[::-1]
+    
+    selected_year = st.selectbox('Select a year', year_list)
+    df_selected_year = calendar[calendar.year == selected_year]
+    # df_selected_year_sorted = df_selected_year.sort_values(by="population", ascending=False)
+
+    color_theme_list = ['blues', 'cividis', 'greens', 'inferno', 'magma', 'plasma', 'reds', 'rainbow', 'turbo', 'viridis']
+    selected_color_theme = st.selectbox('Select a color theme', color_theme_list)
+
+
+#######################
 
 
 # hobbies_1=my_data[my_data['dept_id']=="HOBBIES_1"]
@@ -161,18 +130,3 @@ category_df['revenue'] = category_df['mean_price']*category_df['sum_sale']
 # plt.grid(True)
 
 # plt.show()
-
-#######################
-# Sidebar
-with st.sidebar:
-    st.title('🤖 P5: Pricing Optimization and Analysis Dashboard')
-    
-    year_list = list(my_data.year.unique())[::-1]
-    
-    selected_year = st.selectbox('Select a year', year_list)
-    df_selected_year = my_data[my_data.year == selected_year]
-    # df_selected_year_sorted = df_selected_year.sort_values(by="population", ascending=False)
-
-    color_theme_list = ['blues', 'cividis', 'greens', 'inferno', 'magma', 'plasma', 'reds', 'rainbow', 'turbo', 'viridis']
-    selected_color_theme = st.selectbox('Select a color theme', color_theme_list)
-
