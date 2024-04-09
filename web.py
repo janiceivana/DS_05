@@ -83,10 +83,6 @@ with st.sidebar:
 #######################
 
 def vis_elasticity(data):
-    import streamlit as st
-    import pandas as pd
-    import matplotlib.pyplot as plt
-
     Vis = pd.DataFrame()
 
     for item_id in data['item_id'].unique():
