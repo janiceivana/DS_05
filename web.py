@@ -67,38 +67,29 @@ with st.sidebar:
     
     year_list = list(calendar.year.unique())[::-1]
     dept_list = list(evaluation.dept_id.unique())[::-1]
-    
-    selected_year = st.selectbox('Select a year', year_list)
-    df_selected_year = calendar[calendar.year == selected_year]
+    state_list = list(evaluation.state_id.unique())[::-1]
 
     selected_department = st.selectbox('Select a deparment', dept_list)
     selected_data = department_data[selected_department]
 
+    selected_state = st.selectbox('Select a state', state_list)
+    selected_data = selected_data[selected_data.state_id == selected_state]
+
+    selected_year = st.selectbox('Select a year', year_list)
+    selected_data = selected_data[selected_data.year == selected_year]
+
     # df_selected_year_sorted = df_selected_year.sort_values(by="population", ascending=False)
 
-    color_theme_list = ['blues', 'cividis', 'greens', 'inferno', 'magma', 'plasma', 'reds', 'rainbow', 'turbo', 'viridis']
-    selected_color_theme = st.selectbox('Select a color theme', color_theme_list)
+    # color_theme_list = ['blues', 'cividis', 'greens', 'inferno', 'magma', 'plasma', 'reds', 'rainbow', 'turbo', 'viridis']
+    # selected_color_theme = st.selectbox('Select a color theme', color_theme_list)
 
 #######################
 
 def vis_elasticity(data):
-    Vis = pd.DataFrame()
-
-    for item_id in data['item_id'].unique():
-        entry_df = data[data['item_id'] == item_id]
-        
-        price_change = entry_df["price_change"].mean()
-        sale_change = entry_df["sale_change"].mean()
-        elasticity = entry_df["elasticity"].mean()
-        
-        Vis = Vis.append({'item_id': item_id,
-                        'price_change': price_change,
-                        'sale_change': sale_change,
-                        'elasticity': elasticity},ignore_index=True)
-
+    
     # Create a scatter plot
     fig, ax = plt.subplots()
-    ax.scatter(Vis['price_change'], Vis['sale_change'])
+    ax.scatter(data['price_change'], data['sale_change'])
     ax.set_title('Scatter Plot of Price Change% vs Sale Change%')
     ax.set_xlabel('Price Change%')
     ax.set_ylabel('Sale Change%')
