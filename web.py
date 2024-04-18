@@ -42,18 +42,57 @@ alt.themes.enable("dark")
 # f3_df = pd.read_csv('f3_df.csv')
 
 
-calendar = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\calendar.csv')
-f1_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\f1_df.csv')
-f2_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\f2_df.csv')
-f3_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\f3_df.csv')
-h1_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\h1_df.csv')
-h2_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\h2_df.csv')
-ho1_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\ho1_df.csv')
-ho2_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\ho2_df.csv')
-evaluation = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\sales_train_evaluation.csv')
-validation = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\sales_train_validation.csv')
-sample = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\sample_submission.csv')
-prices = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\sell_prices.csv')
+# calendar = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\calendar.csv')
+# f1_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\f1_df.csv')
+# f2_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\f2_df.csv')
+# f3_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\f3_df.csv')
+# h1_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\h1_df.csv')
+# h2_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\h2_df.csv')
+# ho1_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\ho1_df.csv')
+# ho2_df = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\ho2_df.csv')
+# evaluation = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\sales_train_evaluation.csv')
+# validation = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\sales_train_validation.csv')
+# sample = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\sample_submission.csv')
+# prices = pd.read_csv('D:\\YEAR 3\\Semester 2\\backup\\sell_prices.csv')
+
+file_paths = [
+    'calendar.csv',
+    'f1_df.csv',
+    'f2_df.csv',
+    'f3_df.csv',
+    'h1_df.csv',
+    'h2_df.csv',
+    'ho1_df.csv',
+    'ho2_df.csv',
+    'sales_train_evaluation.csv',
+    'sales_train_validation.csv',
+    'sample_submission.csv',
+    'sell_prices.csv'
+]
+
+dataframes = {}
+
+for file_path in file_paths:
+    try:
+        df = pd.read_csv(f'D:\\YEAR 3\\Semester 2\\backup\\{file_path}')
+        dataframes[file_path.split('.')[0]] = df
+    except FileNotFoundError:
+        print(f'File {file_path} not found.')
+
+# Access the DataFrames using keys
+calendar = dataframes['calendar']
+f1_df = dataframes['f1_df']
+f2_df = dataframes['f2_df']
+f3_df = dataframes['f3_df']
+h1_df = dataframes['h1_df']
+h2_df = dataframes['h2_df']
+ho1_df = dataframes['ho1_df']
+ho2_df = dataframes['ho2_df']
+evaluation = dataframes['sales_train_evaluation']
+validation = dataframes['sales_train_validation']
+sample = dataframes['sample_submission']
+prices = dataframes['sell_prices']
+
 
 department_data = {
     'FOODS_3': f3_df,
